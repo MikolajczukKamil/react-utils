@@ -1,12 +1,13 @@
-import React, {Fragment, FunctionComponent, ReactNode} from "react";
+import React, {ReactNode} from "react";
 
 interface IForProps<T> {
     of: T[]
+    /** Should add key prop to every element */
     children: (element: T, index: number) => ReactNode
 }
 
 /**
- * Then is optional, every component different from ElseIf and Else is like Then
+ * Should add key prop to every Component element
  *
  * @example
  * <For of={[1, 2, 3]}>{
