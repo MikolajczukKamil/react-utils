@@ -1,11 +1,14 @@
-import React, {Fragment, FunctionComponent, ReactElement, ReactNode} from "react"
+import {FC, Children, ReactNode} from "react"
 
 interface IIfProps {
+    /** condition like *ngIf="?" */
     con: boolean
-    children: ReactNode
+    children?: ReactNode
 }
 
 /**
+ * Children other then `ElseIf` and `Else` are treated as `Then`
+ *
  * @example
  * <If con={value < 1}>
  *     <Then />
@@ -14,76 +17,59 @@ interface IIfProps {
  *     <ElseIf con={value < 3} />
  *     <Else />
  * </If>
- *
- * @return filtered children, type ReactElement is only to satisfy JSX types check
  */
-export function If({children, con}: IIfProps): ReactElement {
-    if (!Array.isArray(children)) {
-        // Simple <If> {...} </If>
-        return con ? children as any : <></>
-    }
-
-    /**
-     * <If>
-     *     <Then>
-     *     ...<ElseIf>
-     *     ?<Else>
-     * </If>
-     */
-
+export const If: FC<IIfProps> = ({children, con}: IIfProps): any => {
+    /** Whether the condition has already been met */
     let lookElse: boolean = !con
 
-    const positiveFiltered: any = children.filter((child: any): boolean => {
-        // null or {0}
-        if (!child) return con
+    /** Else can be in any position in children array */
+    const elseChildren: ReactNode[] = []
 
+    const thenAndElseIfChildren = Children.map(children, (child: ReactNode) => {
+        if (!child) {
+            return con ? child : null
+        }
+
+        // @ts-ignore
         if (child.type === ElseIf) {
+            // @ts-ignore
             if (lookElse && child.props.con) {
                 lookElse = false
-                return true
+                return child
             }
 
-            return false
+            return null
         }
 
+        // @ts-ignore
         if (child.type === Else) {
-            return false
+            elseChildren.push(child)
+            return null
         }
 
-        return con
+        return con ? child : null
     })
 
-    /**
-     * Else can be in any position in children array
-     */
-    return positiveFiltered.length > 0 || con ? positiveFiltered : children.filter((child: any) => child?.type === Else)
+    return lookElse ? elseChildren : thenAndElseIfChildren
 }
+
+/** not If */
+export const Unless: FC<IIfProps> = ({con, ...props}: IIfProps) => If({...props, con: !con})
+
+
+/** Use only inside `If` else works as `React.Fragment` */
+export const ElseIf: FC<IIfProps> = ({children}: IIfProps) => children as any
+
 
 interface IThenOrElseProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
-/**
- * Use only inside `If` else works like `React.Fragment`
- *
- * @return `children`, type `ReactElement` is only to satisfy `JSX` types check
- */
-export function Else({children}: IThenOrElseProps): ReactElement {
-    return children as any
-}
+/** Use only inside `If` else works as `React.Fragment` */
+export const Else: FC<IThenOrElseProps> = ({children}: IThenOrElseProps) => children as any
 
 /**
- * Use only inside `If` else works like `React.Fragment`
- *
- * @return `children`, type `ReactElement` is only to satisfy `JSX` types check
+ * Use only inside `If` else works as `React.Fragment`
+ * `Then` is optional, every component different from `ElseIf` and `Else` is treated as `Then`
  */
-export function ElseIf({children}: IIfProps): ReactElement {
-    return children as any
-}
-
-/**
- * Use only inside `If` else works like `React.Fragment`
- *
- * `Then` is optional, every component different from `ElseIf` and `Else` is treated like `Then`
- */
-export const Then: FunctionComponent<IThenOrElseProps> = Fragment
+export const Then: FC<IThenOrElseProps> = ({children}: IThenOrElseProps) => children as any
