@@ -17,7 +17,7 @@ The simple wrapper for looping in react, similar effect to Angular `*ngFor="?"`
 ```
 
 ## If
-Render React components conditionally., similar effect to Angular `*ngIf="?"`
+Render React components conditionally, similar effect to Angular `*ngIf="?"`
 
 ```typescript jsx
 // Default 
@@ -36,7 +36,7 @@ Render React components conditionally., similar effect to Angular `*ngIf="?"`
 ```
 
 ## Switch
-Render React components conditionally., similar effect to Angular `[ngSwitch]="?"`
+Render React components conditionally, similar effect to Angular `[ngSwitch]="?"`
 
 ```typescript jsx
 // Default 
