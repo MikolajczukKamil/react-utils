@@ -33,7 +33,7 @@ export function If({children, con}: IIfProps): ReactElement {
 
     let lookElse: boolean = !con
 
-    return children.filter((child: any): boolean => {
+    const positiveFiltered: any = children.filter((child: any): boolean => {
         // null or {0}
         if (!child) return con
 
@@ -47,11 +47,16 @@ export function If({children, con}: IIfProps): ReactElement {
         }
 
         if (child.type === Else) {
-            return lookElse && !con
+            return false
         }
 
         return con
-    }) as any
+    })
+
+    /**
+     * Else can be in any position in children array
+     */
+    return positiveFiltered.length > 0 || con ? positiveFiltered : children.filter((child: any) => child?.type === Else)
 }
 
 interface IThenOrElseProps {
