@@ -1,4 +1,4 @@
-import React, {Fragment, FunctionComponent, ReactNode} from "react";
+import React, {Fragment, FunctionComponent, ReactElement, ReactNode} from "react"
 
 interface IIfProps {
     con: boolean
@@ -6,8 +6,6 @@ interface IIfProps {
 }
 
 /**
- * Then is optional, every component different from ElseIf and Else is like Then
- *
  * @example
  * <If con={value < 1}>
  *     <Then />
@@ -16,11 +14,13 @@ interface IIfProps {
  *     <ElseIf con={value < 3} />
  *     <Else />
  * </If>
+ *
+ * @return filtered children, type ReactElement is only to satisfy JSX types check
  */
-export function If({children, con}: IIfProps) {
+export function If({children, con}: IIfProps): ReactElement {
     if (!Array.isArray(children)) {
         // Simple <If> {...} </If>
-        return <>{con ? children : null}</>
+        return con ? children as any : <></>
     }
 
     /**
@@ -31,29 +31,27 @@ export function If({children, con}: IIfProps) {
      * </If>
      */
 
-    let lookElse: boolean = !con;
+    let lookElse: boolean = !con
 
-    return <>{
-        children.filter((child: any) => {
-            // null
-            if (!child) return false;
+    return children.filter((child: any): boolean => {
+        // null or {0}
+        if (!child) return con
 
-            if (child.type === ElseIf) {
-                if (lookElse && child.props.con) {
-                    lookElse = false;
-                    return true;
-                }
-
-                return false;
+        if (child.type === ElseIf) {
+            if (lookElse && child.props.con) {
+                lookElse = false
+                return true
             }
 
-            if (child.type === Else) {
-                return lookElse && !con;
-            }
+            return false
+        }
 
-            return con;
-        })
-    }</>
+        if (child.type === Else) {
+            return lookElse && !con
+        }
+
+        return con
+    }) as any
 }
 
 interface IThenOrElseProps {
@@ -61,25 +59,26 @@ interface IThenOrElseProps {
 }
 
 /**
- * Use only inside If else works like React.Fragment
+ * Use only inside `If` else works like `React.Fragment`
  *
- * Optional,
- * every component different from ElseIf and Else is like Then,
- * default value if condition is true
+ * @return `children`, type `ReactElement` is only to satisfy `JSX` types check
  */
-export const Then: FunctionComponent<IThenOrElseProps> = Fragment;
-
-/**
- * Use only inside If else works like React.Fragment
- */
-export function Else({children}: IThenOrElseProps) {
-    return <>{children}</>;
+export function Else({children}: IThenOrElseProps): ReactElement {
+    return children as any
 }
 
 /**
- * Use only inside If else works like React.Fragment
+ * Use only inside `If` else works like `React.Fragment`
+ *
+ * @return `children`, type `ReactElement` is only to satisfy `JSX` types check
  */
-export function ElseIf({children}: IIfProps) {
-    return <>{children}</>;
+export function ElseIf({children}: IIfProps): ReactElement {
+    return children as any
 }
 
+/**
+ * Use only inside `If` else works like `React.Fragment`
+ *
+ * `Then` is optional, every component different from `ElseIf` and `Else` is treated like `Then`
+ */
+export const Then: FunctionComponent<IThenOrElseProps> = Fragment
