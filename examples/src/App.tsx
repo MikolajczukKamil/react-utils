@@ -1,62 +1,62 @@
-import React from 'react';
-import {If, Then, ElseIf, Else} from "./If";
-import {For} from "./For";
+import React, {useCallback, useState} from 'react'
 
-function Test() {
-    const value = Math.random() * 4
-    const value2 = Math.random() * 2
+import {If, ElseIf, Else} from "./If"
+import {Switch, Case} from "./Switch"
+import {For} from "./For"
 
-    return (
-        <If con={value < 1}>
-            <b>S</b>t<Then>art</Then>
+function ToEnglish({num}: { num: number }) {
+    return <Switch by={num}>
+        <Case value={0}>Zero</Case>
+        <Case value={1}>One</Case>
+        <Case value={2}>Two</Case>
+        <Case value={3}>Three</Case>
 
-            <If con={value2 < 1}>
-                {' '}Value 2 is {value2};
-
-                <Else>
-                    Value 2 is too big
-                </Else>
-            </If>
-
-            <ElseIf con={value < 2}>
-                ElseIf 1
-            </ElseIf>
-
-            <ElseIf con={value < 3}>
-                ElseIf 2
-            </ElseIf>
-
-            <Else>
-                Else
-            </Else>
-
-            {null}
-        </If>
-    );
+        Unknown
+    </Switch>
 }
 
 export default function App() {
-    return <div>
-        <If con={Math.random() < 0.5}>
-            <For of={Array(10).fill(0)}>
-                {
-                    (_, i) => <div key={i}>
-                        {i.toString().padStart(2, '_')}
-                        <Test/>
-                    </div>
-                }
+    const [numbers, setNumbers] = useState([0])
+
+    const addNumber = useCallback(() => {
+        setNumbers(l => [...l, l[l.length - 1] + 1])
+    }, [])
+
+    const removeNumber = useCallback(() => {
+        setNumbers(([_, ...l]) => l)
+    }, [])
+
+    return (
+        <>
+            <h2>{numbers[0]} - {numbers[numbers.length - 1]}</h2>
+
+            <If con={numbers.length >= 5}>
+                <button onClick={removeNumber}>-</button>
+
+                <ElseIf con={numbers.length === 1}>
+                    Start!
+                </ElseIf>
+
+                <Else>
+                    <hr/>
+                </Else>
+            </If>
+
+            <For of={numbers}>
+                {(n) => (
+                    <p key={n}>
+                        {n} - <ToEnglish num={n}/>
+                    </p>
+                )}
             </For>
 
-            <Else>
-                <For of={Array(20).fill(0)}>
-                    {
-                        (_, i) => <div key={i}>
-                            {i.toString().padStart(2, '-')}
-                            <Test/>
-                        </div>
-                    }
-                </For>
-            </Else>
-        </If>
-    </div>
+            <If con={numbers.length < 5}>
+                <button onClick={addNumber}>+</button>
+
+                <Else>
+                    <hr/>
+                </Else>
+            </If>
+        </>
+    )
 }
