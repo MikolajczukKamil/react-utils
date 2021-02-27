@@ -1,62 +1,31 @@
-import React, {useCallback, useState} from 'react'
+import React from 'react'
 
-import {If, ElseIf, Else} from "./If"
-import {Switch, Case} from "./Switch"
-import {For} from "./For"
-
-function ToEnglish({num}: { num: number }) {
-    return <Switch by={num}>
-        <Case value={0}>Zero</Case>
-        <Case value={1}>One</Case>
-        <Case value={2}>Two</Case>
-        <Case value={3}>Three</Case>
-
-        Unknown
-    </Switch>
-}
+import SwitchDemo from "./examples/switch"
+import IfAndUnlessDemo from "./examples/if"
+import ForDemo from "./examples/for"
 
 export default function App() {
-    const [numbers, setNumbers] = useState([0])
-
-    const addNumber = useCallback(() => {
-        setNumbers(l => [...l, l[l.length - 1] + 1])
-    }, [])
-
-    const removeNumber = useCallback(() => {
-        setNumbers(([_, ...l]) => l)
-    }, [])
-
     return (
-        <>
-            <h2>{numbers[0]} - {numbers[numbers.length - 1]}</h2>
+        <main>
+            <h1>➣ Demo</h1>
 
-            <If con={numbers.length >= 5}>
-                <button onClick={removeNumber}>-</button>
+            <section>
+                <h2>Switch Case Default</h2>
 
-                <ElseIf con={numbers.length === 1}>
-                    Start!
-                </ElseIf>
+                <SwitchDemo/>
+            </section>
 
-                <Else>
-                    <hr/>
-                </Else>
-            </If>
+            <section>
+                <h2>If ElseIf Else, Unless</h2>
 
-            <For of={numbers}>
-                {(n) => (
-                    <p key={n}>
-                        {n} - <ToEnglish num={n}/>
-                    </p>
-                )}
-            </For>
+                <IfAndUnlessDemo/>
+            </section>
 
-            <If con={numbers.length < 5}>
-                <button onClick={addNumber}>+</button>
+            <section>
+                <h2>For</h2>
 
-                <Else>
-                    <hr/>
-                </Else>
-            </If>
-        </>
+                <ForDemo/>
+            </section>
+        </main>
     )
 }

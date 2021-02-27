@@ -1,50 +1,64 @@
-import {Fragment, ReactElement, ReactNode} from "react"
+import {Children, FC, ReactNode} from "react"
 
-interface ISwitchProps<T> {
-    by: T
-    children: ReactNode
+interface ISwitchProps {
+    children?: ReactNode
+    /** like [ngSwitch]="?" */
+    by: any
 }
 
 /**
  * @example
  * <Switch by={value}>
- *     <Case value={1} />
- *     <Case value={2} />
- *     {...}
- *     ?<Default />
- * </If>
+ *     <Case value={1}> <One /> </Case>
+ *     <Case value={2}> <Two /> </Case>
  *
- * @return filtered `children`, type `ReactElement` is only to satisfy `JSX` types check
+ *     <Default> <NoValue /> <Default>
+ * </Switch>
  */
-export function Switch<T>({children, by}: ISwitchProps<T>): ReactElement {
-    // <Switch><Case /></Switch>
-    const candidates: ReactNode[] = Array.isArray(children) ? children : [children]
+export const Switch: FC<ISwitchProps> = ({children, by}: ISwitchProps): any => {
+    /** Default can be in any position in children array */
+    const defaultChildren: ReactNode[] = []
 
-    return candidates.find(
-        (child: any): boolean => child?.type === Case && child.props.value === by
-        ) ||
-        candidates.filter(
-            (child: any): boolean => !child || child.type !== Case
-        ) as any
+    let isMatchInCases = false
+
+    const caseChildren = Children.map(children, (child: ReactNode) => {
+        if (!child) {
+            defaultChildren.push(child)
+            return null
+        }
+
+        // @ts-ignore
+        if (child.type === Case) {
+            // @ts-ignore
+            if (child.props.value === by) {
+                isMatchInCases = true
+                return child
+            }
+
+            return null
+        }
+
+        defaultChildren.push(child)
+        return null
+    })
+
+    return isMatchInCases ? caseChildren : defaultChildren
 }
 
-interface ICaseProps<T> {
-    value: T
+interface ICaseProps {
+    value: any
     children: ReactNode
 }
 
-/**
- * Use only inside `Switch` else works like `React.Fragment`
- *
- * @return `children`, type `ReactElement` is only to satisfy `JSX` types check
- */
-export function Case<T>({children}: ICaseProps<T>): ReactElement {
-    return children as any
+/** Use only inside `Switch` else works like `React.Fragment` */
+export const Case: FC<ICaseProps> = ({children}: ICaseProps) => children as any
+
+interface IDefaultProps {
+    children?: ReactNode
 }
 
 /**
- * Use only inside `Switch` else works like `React.Fragment`
- *
- * `Default` is optional, every component different from `Case` is treated like `Default`
+ * Use only inside `Switch` else works as `React.Fragment`
+ * `Default` is optional, every component different from `Case` is treated as `Default`
  */
-export const Default = Fragment
+export const Default: FC<IDefaultProps> = ({children}: IDefaultProps) => children as any
