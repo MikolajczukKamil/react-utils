@@ -10,8 +10,6 @@ export default function IfDemo() {
             value = {' '}
 
             <If con={magicNumber < 4}>
-                {0}
-                {NaN}
                 <Then> Too little 💚 </Then>
 
                 <ElseIf con={magicNumber <= 6}> Average 💎 </ElseIf>
