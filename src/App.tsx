@@ -2,6 +2,7 @@ import SwitchDemo from './examples/switch'
 import IfAndUnlessDemo from './examples/if'
 import ForDemo from './examples/for'
 import ContextDemo from './examples/strictContextDemo'
+import ThemeDemo from './examples/theme'
 
 export default function App() {
   return (
@@ -30,6 +31,12 @@ export default function App() {
         <h2>Context</h2>
 
         <ContextDemo />
+      </section>
+
+      <section>
+        <h2>useDarkTheme</h2>
+
+        <ThemeDemo />
       </section>
     </main>
   )
